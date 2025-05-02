@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G-Lock Discord Ticket Bot Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-ticket-alt"></i>
+                <h1>G-Lock Tickets</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="#tickets"><i class="fas fa-ticket-alt"></i> Tickets</a>
+                    </li>
+                    <li>
+                        <a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=5865F2&color=fff" alt="User Avatar">
+                    </div>
+                    <div class="user-details">
+                        <p class="user-name">Admin User</p>
+                        <p class="user-role">Administrator</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search tickets...">
+                </div>
+                <div class="header-actions">
+                    <button class="btn new-ticket-btn">
+                        <i class="fas fa-plus"></i> New Ticket
+                    </button>
+                    <div class="notification-icon">
+                        <i class="far fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="page-content dashboard-content active" id="dashboard-content">
+                <h2 class="page-title">Dashboard</h2>
+
+                <!-- Stats Cards -->
+                <div class="stats-container">
+                    <div class="stats-card">
+                        <div class="stats-icon open-tickets">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Open Tickets</h3>
+                            <p class="stats-value" id="open-tickets-count">12</p>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-icon resolved">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Resolved Today</h3>
+                            <p class="stats-value" id="resolved-today-count">8</p>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-icon response-time">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Avg. Response Time</h3>
+                            <p class="stats-value" id="avg-response-time">2.5 hrs</p>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-icon staff-online">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stats-info">
+                            <h3>Staff Online</h3>
+                            <p class="stats-value" id="staff-online-count">3</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Tickets -->
+                <div class="section recent-tickets">
+                    <div class="section-header">
+                        <h3>Recent Tickets</h3>
+                        <a href="#tickets" class="view-all">View All</a>
+                    </div>
+                    <div class="tickets-table-container">
+                        <table class="tickets-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Created By</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-tickets-tbody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Ticket Categories -->
+                <div class="section categories-chart">
+                    <div class="section-header">
+                        <h3>Ticket Categories</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="categories-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tickets Content -->
+            <div class="page-content tickets-content" id="tickets-content">
+                <h2 class="page-title">Tickets</h2>
+
+                <!-- Ticket Filters -->
+                <div class="ticket-filters">
+                    <div class="filter-group">
+                        <label for="status-filter">Status:</label>
+                        <select id="status-filter">
+                            <option value="all">All</option>
+                            <option value="NEW">New</option>
+                            <option value="OPEN">Open</option>
+                            <option value="WAITING">Waiting</option>
+                            <option value="RESOLVED">Resolved</option>
+                            <option value="CLOSED">Closed</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="category-filter">Category:</label>
+                        <select id="category-filter">
+                            <option value="all">All</option>
+                            <option value="TECHNICAL_SUPPORT">Technical Support</option>
+                            <option value="ACCOUNT_ISSUES">Account Issues</option>
+                            <option value="BILLING">Billing</option>
+                            <option value="FEATURE_REQUESTS">Feature Requests</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sort-by">Sort By:</label>
+                        <select id="sort-by">
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="priority">Priority</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- All Tickets -->
+                <div class="tickets-table-container">
+                    <table class="tickets-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Created By</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="all-tickets-tbody">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="pagination-btn" id="prev-page">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <div class="page-numbers" id="page-numbers">
+                        <span class="page-number active">1</span>
+                        <span class="page-number">2</span>
+                        <span class="page-number">3</span>
+                    </div>
+                    <button class="pagination-btn" id="next-page">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="page-content settings-content" id="settings-content">
+                <h2 class="page-title">Settings</h2>
+
+                <!-- Settings Form -->
+                <div class="settings-form">
+                    <div class="settings-section">
+                        <h3>Discord Server Settings</h3>
+                        <div class="form-group">
+                            <label for="server-id">Server ID</label>
+                            <input type="text" id="server-id" value="12345678901234567" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="tickets-category">Tickets Category</label>
+                            <select id="tickets-category">
+                                <option value="">Select Category</option>
+                                <option value="12345678901234" selected>Support Tickets</option>
+                                <option value="23456789012345">Private Tickets</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="archive-category">Archive Category</label>
+                            <select id="archive-category">
+                                <option value="">Select Category</option>
+                                <option value="34567890123456" selected>Archived Tickets</option>
+                                <option value="45678901234567">Old Tickets</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Role Settings</h3>
+                        <div class="form-group">
+                            <label for="staff-role">Staff Role</label>
+                            <select id="staff-role">
+                                <option value="">Select Role</option>
+                                <option value="56789012345678" selected>Support Staff</option>
+                                <option value="67890123456789">Moderators</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-role">Admin Role</label>
+                            <select id="admin-role">
+                                <option value="">Select Role</option>
+                                <option value="78901234567890" selected>Administrators</option>
+                                <option value="89012345678901">Owners</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Ticket Settings</h3>
+                        <div class="form-group">
+                            <label for="welcome-message">Welcome Message</label>
+                            <textarea id="welcome-message" rows="4">Thank you for creating a ticket. A staff member will assist you shortly. Please provide as much detail as possible about your issue.</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="auto-close">Auto-Close After (hours)</label>
+                            <input type="number" id="auto-close" value="72">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary" id="save-settings">Save Settings</button>
+                        <button class="btn btn-secondary">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ticket View Modal -->
+    <div class="modal" id="ticket-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-ticket-title">Ticket #1234 - Cannot login to my account</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="ticket-details">
+                    <div class="ticket-info">
+                        <div class="ticket-info-item">
+                            <span class="label">Status:</span>
+                            <select id="modal-ticket-status">
+                                <option value="NEW">New</option>
+                                <option value="OPEN" selected>Open</option>
+                                <option value="WAITING">Waiting</option>
+                                <option value="RESOLVED">Resolved</option>
+                                <option value="CLOSED">Closed</option>
+                            </select>
+                        </div>
+                        <div class="ticket-info-item">
+                            <span class="label">Priority:</span>
+                            <select id="modal-ticket-priority">
+                                <option value="LOW">Low</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="HIGH" selected>High</option>
+                                <option value="URGENT">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="ticket-info-item">
+                            <span class="label">Category:</span>
+                            <span id="modal-ticket-category">Account Issues</span>
+                        </div>
+                        <div class="ticket-info-item">
+                            <span class="label">Created:</span>
+                            <span id="modal-ticket-created">May 1, 2023</span>
+                        </div>
+                        <div class="ticket-info-item">
+                            <span class="label">Created by:</span>
+                            <span id="modal-ticket-creator">JohnDoe#1234</span>
+                        </div>
+                        <div class="ticket-info-item">
+                            <span class="label">Assigned to:</span>
+                            <select id="modal-ticket-assignee">
+                                <option value="">Unassigned</option>
+                                <option value="1" selected>Support Agent 1</option>
+                                <option value="2">Support Agent 2</option>
+                                <option value="3">Support Agent 3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="ticket-messages" id="modal-ticket-messages">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+
+                    <div class="ticket-reply">
+                        <textarea id="ticket-reply-box" placeholder="Type your reply here..."></textarea>
+                        <div class="ticket-reply-actions">
+                            <button class="btn btn-primary" id="send-reply">Send Reply</button>
+                            <button class="btn btn-outline">Attach File</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="close-ticket">Close Ticket</button>
+                <button class="btn btn-secondary" id="close-modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Ticket Modal -->
+    <div class="modal" id="new-ticket-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Ticket</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="new-ticket-title">Title</label>
+                    <input type="text" id="new-ticket-title" placeholder="Enter ticket title">
+                </div>
+                <div class="form-group">
+                    <label for="new-ticket-category">Category</label>
+                    <select id="new-ticket-category">
+                        <option value="TECHNICAL_SUPPORT">Technical Support</option>
+                        <option value="ACCOUNT_ISSUES">Account Issues</option>
+                        <option value="BILLING">Billing</option>
+                        <option value="FEATURE_REQUESTS">Feature Requests</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="new-ticket-description">Description</label>
+                    <textarea id="new-ticket-description" rows="5" placeholder="Enter ticket description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="new-ticket-priority">Priority</label>
+                    <select id="new-ticket-priority">
+                        <option value="LOW">Low</option>
+                        <option value="MEDIUM" selected>Medium</option>
+                        <option value="HIGH">High</option>
+                        <option value="URGENT">Urgent</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="create-ticket">Create Ticket</button>
+                <button class="btn btn-secondary close-modal-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
